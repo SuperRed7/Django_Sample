@@ -57,7 +57,8 @@ class IndexView(generic.ListView):
         return Question.objects.filter(
             pub_date__lte=timezone.now()
         ).order_by('-pub_date')[:5]
-
+        # return Question.objects.filter(pub_date__date=datetime.date.today())
+        # return Question.objects.filter(question_text__contains='今天')
 
 class DetailView(generic.DetailView):
     model = Question
