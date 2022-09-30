@@ -144,3 +144,6 @@ CACHES = {
 #         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
 #     }
 # }
+
+LOGIN_REDIRECT_URL = '/sqldemo/index'
+LOGOUT_REDIRECT_URL = '/accounts/login'

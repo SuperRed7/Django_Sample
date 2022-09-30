@@ -10,6 +10,7 @@ from io import BytesIO as IO
 from sqldemo.charts import echarts_stackbar
 import datetime
 from django.views.decorators.cache import cache_page
+from django.contrib.auth.decorators import login_required
 
 ENGINE = create_engine('postgresql://postgres:123456@localhost/django_sample')
 DBTABLE = 'sqldemo_data'
@@ -133,6 +134,8 @@ def ptable(df_data):
     return df_combined
 
 
+@login_required
+@cache_page(60 * 60 * 24 * 30)
 def search(request, column, kw):
     # print('KW:', kw)
     # 最简单的单一字符串like,返回不重复的前10个结果
@@ -269,6 +272,7 @@ def get_df(form_dict, is_pivoted=True):
         return df
 
 
+@login_required
 @cache_page(60 * 60 * 24 * 30)  # 缓存30天
 def query(request):
     form_dict = dict(six.iterlists(request.GET))
@@ -299,6 +303,8 @@ def query(request):
                         content_type="application/json charset=utf-8")  # 返回结果必须是json格式
 
 
+@login_required
+@cache_page(60 * 60 * 24 * 30)
 def export(request, type):
     form_dict = dict(six.iterlists(request.GET))
 
@@ -351,6 +357,7 @@ def prepare_chart(df,  # 输入经过pivoted方法透视过的df,不是原始df
         return None
 
 
+@login_required
 def index(request):
     # # 标准sql语句,此处为测试返回数据库中sqldemo_data表的数据条目n,之后可以用python处理字符串的方式动态扩展
     # sql = "select count(*) as 总数 from sqldemo_data;"

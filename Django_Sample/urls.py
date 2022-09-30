@@ -23,4 +23,5 @@ urlpatterns = [
     path('Web_Sample/', include('Web_Sample.urls')),
     path('sqldemo/', include('sqldemo.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
