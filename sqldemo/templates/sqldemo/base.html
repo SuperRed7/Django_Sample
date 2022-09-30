@@ -1,0 +1,40 @@
+<!-- 载入静态文件 更早版本可能会用load staticfiles -->
+{% load static %}
+
+<!DOCTYPE html>
+<!-- 网站主语言 -->
+<html lang="zh-cn">
+
+<head>
+    <!-- 网站采用的字符编码 -->
+    <meta charset="utf-8">
+    <title>数据分析</title>
+    <!-- DataTables SemanticUI 主题的CSS -->
+    <link rel="stylesheet" href="{% static 'datatables/dataTables.semanticui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Semantic-UI-CSS-master/semantic.min.css' %}">
+    <script src="{% static 'jquery/jquery-3.6.1.js' %}"></script>
+    <!-- DataTables 主JS -->
+    <script src="{% static 'datatables/jquery.dataTables.min.js' %}"></script>
+    <!-- DataTables SemanticUI 主题的JS -->
+    <script src="{% static 'datatables/dataTables.semanticui.min.js' %}"></script>
+    <!-- DataTables 百分数条形图插件 -->
+    <script src="{% static 'datatables/percentageBars.js' %}"></script>
+    <script type="text/javascript" src="{% static 'Semantic-UI-CSS-master/semantic.js' %}"></script>
+    <script src="{% static 'echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'echarts/china.js' %}"></script>
+</head>
+
+
+
+<body>
+
+<!-- 引入导航栏 -->
+{% include 'sqldemo/header.html' %}
+<!-- 预留具体页面的位置 -->
+{% block body %}{% endblock body %}
+<!-- 引入注脚 -->
+{% include 'sqldemo/footer.html' %}
+
+</body>
+
+</html>

@@ -21,5 +21,6 @@ import Web_Sample
 urlpatterns = [
     # path('', include('Web_Sample.urls')),
     path('Web_Sample/', include('Web_Sample.urls')),
+    path('sqldemo/', include('sqldemo.urls')),
     path('admin/', admin.site.urls),
 ]

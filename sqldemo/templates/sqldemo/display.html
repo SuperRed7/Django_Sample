@@ -1,0 +1,164 @@
+{% extends "sqldemo/analysis.html" %}
+{% block display %}
+{#用AJAX异步加载的返回里调用的,没法应用django tag#}
+{#{% load tags %}#}
+<!-- 数据处理时的loading遮罩 -->
+<div class="ui active dimmer" id="dimmer">
+    <div class="ui text" style="color: #FFFFFF">请使用左侧筛选框选择分析维度和定义市场</div>
+</div>
+
+<!-- 创建2个Semantic UI tab,根据鼠标点击切换,以保证页面干净清爽 -->
+<div class="ui pointing secondary menu">
+    <a class="item active" data-tab="total"><i class="circle icon"></i>总体表现</a>
+    <a class="item" data-tab="competition"><i class="trophy icon"></i>竞争现状</a>
+    <a class="item" data-tab="export"><i class="download icon"></i>导出数据</a>
+</div>
+<div class="ui tab segment active" data-tab="total">
+    <h3 class="ui header">
+        <div class="content">
+            定义市场当前表现
+            <div class="sub header">KPIS</div>
+        </div>
+    </h3>
+    <div class="ui divider"></div>
+    <!-- Semantic UI的statistic类能呈现“醒目大数字”的效果 -->
+    <div class="ui small three statistics">
+        <div class="statistic">
+            <div class="value" id="value_size">
+                {{ market_size }}
+            </div>
+            <div class="label" id="label_size_unit">
+                总滚动年金额
+            </div>
+        </div>
+        <div class="statistic" id="div_gr">
+            <div class="value" id="value_gr">
+                {{ market_gr }}
+{#                用AJAX异步加载的返回里调用的,没法应用django tag#}
+{#                {{ market_gr|percentage:1 }}#}
+            </div>
+            <div class="label">
+                同比增长
+            </div>
+        </div>
+        <div class="statistic" id="div_cagr">
+            <div class="value" id="value_cagr">
+                {{ market_cagr }}
+{#                用AJAX异步加载的返回里调用的,没法应用django tag#}
+{#                {{ market_cagr|percentage:1 }}#}
+            </div>
+            <div class="label">
+                4年CAGR
+            </div>
+        </div>
+    </div>
+    <h3 class="ui header">
+        <div class="content">
+            定义市场总量趋势
+            <div class="sub header">柱状折线复合图</div>
+        </div>
+    </h3>
+    <div class="ui divider"></div>
+    <div class="ui container">
+        <div id="bar_total_trend" style="width:1000px; height:600px;"></div>
+    </div>
+</div>
+
+<div class="ui tab segment" data-tab="export">
+    <div class="ui buttons">
+        <input class="ui blue button" type='button' id='export_pivot' value="导出整理后时间序列数据"/>
+    </div>
+    <div class="ui buttons">
+        <input class="ui blue button" type='button' id='export_raw' value="导出原始数据"/>
+    </div>
+</div>
+
+<div class="ui tab segment" data-tab="competition">
+    <h3 class="ui header">
+        <div class="content">
+            最新横断面KPI一览
+            <div class="sub header">数据表格</div>
+        </div>
+    </h3>
+    <div class="ui divider"></div>
+    <div class="ui top attached button" tabindex="0"
+         onclick="selectElementContents( document.getElementById('ptable') );"
+         data-content="复制成功" data-position="bottom center">
+        <i class="copy icon"></i>
+        复制到剪贴板
+    </div>
+    <div class="ui container" id='result_table' style="width: 100%; overflow-x: scroll; overflow-y: hidden;">
+        <!-- Django渲染html代码时需要加入|safe,保证html不会被自动转义 -->
+        {{ ptable|safe }}
+    </div>
+
+<!-- 下方js为保证Semantic UI tab类工作 -->
+<script>
+    $('.pointing.secondary.menu .item').tab();
+    // 复制有node结构的文本区域
+    function selectElementContents(el) {
+        var body = document.body, range, sel;
+        if (document.createRange && window.getSelection) {
+            range = document.createRange();
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            try {
+                range.selectNodeContents(el);
+                sel.addRange(range);
+            } catch (e) {
+                range.selectNode(el);
+                sel.addRange(range);
+            }
+        } else if (body.createTextRange) {
+            range = body.createTextRange();
+            range.moveToElementText(el);
+            range.select();
+        }
+        document.execCommand("Copy");
+    };
+    // 按钮点击后有弹出文本,显示data-content内容“复制成功”
+    $('.ui.top.attached.button')
+        .popup({
+            on: 'click'
+        })
+    ;
+</script>
+
+<script type="text/javascript">
+    $("#AJAX_get").click(function (event) {
+        var dimmer = $("#dimmer");
+        dimmer.attr('class', 'ui active dimmer'); // 点击筛选按钮后dimmer变成active
+        dimmer.children('div').remove(); // 删除初始化文字
+        dimmer.append('<div class="ui text loader">数据加载中……</div>'); // 增加loading效果和文字
+
+        $.ajax({
+            success: function (ret) {     //成功执行
+                // 去除加载遮罩（去掉active）
+                dimmer.attr('class', 'ui dimmer');
+            },
+            error: function () {            //失败
+                console.log('失败');
+                dimmer.children('div').text('有错误发生,无法完成查询'); // AJAX回调失败则报错
+            }
+        });
+    })
+</script>
+
+<script>
+    $("#export_pivot").click(function(){
+        var form_data = getForm();
+
+        var downloadUrl = '{% url 'sqldemo:export' 'pivoted' %}'+ '?' + $.param(form_data, true);
+        window.location.href = downloadUrl;
+    });
+
+    $("#export_raw").click(function(){
+        var form_data = getForm();
+
+        var downloadUrl = '{% url 'sqldemo:export' 'raw' %}'+ '?' + $.param(form_data, true);
+        window.location.href = downloadUrl;
+    })
+</script>
+    
+{% endblock %}
+
