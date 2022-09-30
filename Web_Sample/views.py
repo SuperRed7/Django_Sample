@@ -60,6 +60,7 @@ class IndexView(generic.ListView):
         # return Question.objects.filter(pub_date__date=datetime.date.today())
         # return Question.objects.filter(question_text__contains='今天')
 
+
 class DetailView(generic.DetailView):
     model = Question
     template_name = 'Web_Sample/detail.html'
